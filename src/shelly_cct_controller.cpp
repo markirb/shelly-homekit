@@ -55,8 +55,15 @@ StateCCT CCTController::ConfigToState(const struct mgos_config_lb &cfg) const {
   int temp_min = 50;
   temp -= temp_min;
   temp /= (temp_max - temp_min);
-  state.ww = temp * v;
-  state.cw = (1.0f - temp) * v;
+  state.ww = temp;
+  state.cw = (1.0f - temp);
+
+  // scale to at least one channel is at 100%
+  float max = std::max(state.ww, state.cw);
+  state = state * (1.0f / max);
+
+  // scale by brightness
+  state = state * v;
   return state;
 }
 
