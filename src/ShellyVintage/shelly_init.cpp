@@ -41,7 +41,7 @@ void CreateComponents(std::vector<std::unique_ptr<Component>> *comps,
   lightbulb_controller.reset(new WhiteController(lb_cfg, FindOutput(1)));
 
   hap_light.reset(new hap::LightBulb(
-      1, nullptr, std::move(lightbulb_controller), lb_cfg, false));
+      1, nullptr, nullptr, std::move(lightbulb_controller), lb_cfg, false));
 
   if (hap_light == nullptr || !hap_light->Init().ok()) {
     return;
@@ -61,5 +61,4 @@ void CreateComponents(std::vector<std::unique_ptr<Component>> *comps,
     return kHAPError_None;
   });
 }
-
 }  // namespace shelly

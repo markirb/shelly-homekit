@@ -740,9 +740,7 @@ function updateComponent(cd) {
         setValueIfNotModified(el(c, "name"), cd.name);
         el(c, "state").checked = cd.state;
         if (cd.apower !== undefined) {
-          updateInnerText(
-              el(c, "power_stats"),
-              `${Math.round(cd.apower)}W, ${cd.aenergy}Wh`);
+          updateInnerText(el(c, "power_stats"), `${Math.round(cd.apower)}W`);
           el(c, "power_stats_container").style.display = "block";
         }
         slideIfNotModified(el(c, "color_temperature"), cd.color_temperature);

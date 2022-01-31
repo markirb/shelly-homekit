@@ -29,13 +29,14 @@
 #include "shelly_input.hpp"
 #include "shelly_light_bulb_controller.hpp"
 #include "shelly_output.hpp"
+#include "shelly_pm.hpp"
 
 namespace shelly {
 namespace hap {
 
 class LightBulb : public Component, public mgos::hap::Service {
  public:
-  LightBulb(int id, Input *in,
+  LightBulb(int id, Input *in, PowerMeter *out_pm,
             std::unique_ptr<LightBulbControllerBase> controller,
             struct mgos_config_lb *cfg, bool is_optional);
   virtual ~LightBulb();
@@ -71,6 +72,7 @@ class LightBulb : public Component, public mgos::hap::Service {
 
   Input *const in_;
   std::unique_ptr<LightBulbControllerBase> const controller_;
+  PowerMeter *const out_pm_;
   struct mgos_config_lb *cfg_;
   bool is_optional_;
 

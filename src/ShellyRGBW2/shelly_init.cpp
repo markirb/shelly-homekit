@@ -20,6 +20,7 @@
 #include "shelly_hap_light_bulb.hpp"
 #include "shelly_input_pin.hpp"
 #include "shelly_main.hpp"
+#include "shelly_pm_shunt.hpp"
 #include "shelly_rgbw_controller.hpp"
 #include "shelly_sys_led_btn.hpp"
 #include "shelly_white_controller.hpp"
@@ -28,7 +29,7 @@ namespace shelly {
 
 void CreatePeripherals(std::vector<std::unique_ptr<Input>> *inputs,
                        std::vector<std::unique_ptr<Output>> *outputs,
-                       std::vector<std::unique_ptr<PowerMeter>> *pms UNUSED_ARG,
+                       std::vector<std::unique_ptr<PowerMeter>> *pms,
                        std::unique_ptr<TempSensor> *sys_temp UNUSED_ARG) {
   outputs->emplace_back(new OutputPin(1, 12, 1));  // R / CW0
   outputs->emplace_back(new OutputPin(2, 15, 1));  // G / WW0
@@ -41,6 +42,14 @@ void CreatePeripherals(std::vector<std::unique_ptr<Input>> *inputs,
 
   InitSysLED(LED_GPIO, LED_ON);
   InitSysBtn(BTN_GPIO, BTN_DOWN);
+
+  std::unique_ptr<PowerMeter> pm(new ShuntPowerMeter(1, 0, 24));
+  Status st;
+  if (!(st = pm->Init()).ok())
+    LOG(LL_ERROR, ("PM init failed: %s", st.ToString().c_str()));
+  else {
+    pms->emplace_back(std::move(pm));
+  }
 }
 
 void CreateComponents(std::vector<std::unique_ptr<Component>> *comps,
@@ -100,12 +109,14 @@ void CreateComponents(std::vector<std::unique_ptr<Component>> *comps,
     }
 
     Input *in = FindInput(1);
+    PowerMeter *pm = FindPM(1);
     if (i != 0) {
       in = nullptr;  // support input only for first device
+      pm = nullptr;
     }
 
     hap_light.reset(new hap::LightBulb(
-        i + 1, in, std::move(lightbulb_controller), lb_cfg, is_optional));
+        i + 1, in, pm, std::move(lightbulb_controller), lb_cfg, is_optional));
 
     if (hap_light == nullptr) return;
     auto st = hap_light->Init();

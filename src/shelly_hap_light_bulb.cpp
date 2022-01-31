@@ -27,7 +27,7 @@
 namespace shelly {
 namespace hap {
 
-LightBulb::LightBulb(int id, Input *in,
+LightBulb::LightBulb(int id, Input *in, PowerMeter *out_pm,
                      std::unique_ptr<LightBulbControllerBase> controller,
                      struct mgos_config_lb *cfg, bool is_optional)
     : Component(id),
@@ -37,6 +37,7 @@ LightBulb::LightBulb(int id, Input *in,
               kHAPServiceDebugDescription_LightBulb),
       in_(in),
       controller_(std::move(controller)),
+      out_pm_(out_pm),
       cfg_(cfg),
       is_optional_(is_optional),
       auto_off_timer_(std::bind(&LightBulb::AutoOffTimerCB, this)) {
@@ -275,17 +276,25 @@ StatusOr<std::string> LightBulb::GetInfo() const {
 }
 
 StatusOr<std::string> LightBulb::GetInfoJSON() const {
-  return mgos::JSONPrintStringf(
+  std::string res = mgos::JSONPrintStringf(
       "{id: %d, type: %d, name: %Q, svc_hidden: %B, state: %B, "
       " brightness: %d, hue: %d, saturation: %d, "
       " in_inverted: %B, initial: %d, in_mode: %d, "
       "auto_off: %B, auto_off_delay: %.3f, transition_time: %d, "
-      "color_temperature: %d, bulb_type: %d, hap_optional: %d}",
+      "color_temperature: %d, bulb_type: %d, hap_optional: %d",
       id(), type(), cfg_->name, cfg_->svc_hidden, cfg_->state, cfg_->brightness,
       cfg_->hue, cfg_->saturation, cfg_->in_inverted, cfg_->initial_state,
       cfg_->in_mode, cfg_->auto_off, cfg_->auto_off_delay,
       cfg_->transition_time, cfg_->color_temperature, controller_->Type(),
       is_optional_);
+  if (out_pm_ != nullptr) {
+    auto power = out_pm_->GetPowerW();
+    if (power.ok()) {
+      mgos::JSONAppendStringf(&res, ", apower: %.3f", power.ValueOrDie());
+    }
+  }
+  res.append("}");
+  return res;
 }
 
 Status LightBulb::SetConfig(const std::string &config_json,

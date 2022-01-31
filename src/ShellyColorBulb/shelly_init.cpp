@@ -45,7 +45,7 @@ void CreateComponents(std::vector<std::unique_ptr<Component>> *comps,
       lb_cfg, FindOutput(1), FindOutput(2), FindOutput(3), FindOutput(4)));
 
   hap_light.reset(new hap::LightBulb(
-      1, nullptr, std::move(lightbulb_controller), lb_cfg, false));
+      1, nullptr, nullptr, std::move(lightbulb_controller), lb_cfg, false));
 
   if (hap_light == nullptr || !hap_light->Init().ok()) {
     return;
