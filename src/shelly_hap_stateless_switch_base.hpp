@@ -57,8 +57,9 @@ class StatelessSwitchBase : public Component, public mgos::hap::Service {
                    bool *restart_required) override;
   Status SetState(const std::string &state_json) override;
 
- private:
+protected:
   void InputEventHandler(Input::Event ev, bool state);
+ private:
 
   void RaiseEvent(uint8_t ev);
 

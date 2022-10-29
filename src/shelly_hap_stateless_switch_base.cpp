@@ -127,7 +127,7 @@ void StatelessSwitchBase::InputEventHandler(Input::Event ev, bool state) {
   const auto in_mode = static_cast<InMode>(cfg_->in_mode);
   switch (in_mode) {
     // In momentary input mode we translate input events to HAP events directly.
-    case InMode::kMomentary:
+    case InMode::kMomentary:s
       switch (ev) {
         case Input::Event::kSingle:
           RaiseEvent(

@@ -66,13 +66,13 @@ class InputPin : public Input {
 
   static void GPIOIntHandler(int pin, void *arg);
 
-  void DetectReset(double now, bool cur_state);
+  void DetectReset(int64_t now, bool cur_state);
 
   void HandleTimer();
 
   bool last_state_ = false;
-  int change_cnt_ = 0;         // State change counter for reset.
-  double last_change_ts_ = 0;  // Timestamp of last change (uptime).
+  int change_cnt_ = 0;          // State change counter for reset.
+  int64_t last_change_ts_ = 0;  // Timestamp of last change (uptime).
 
   State state_ = State::kIdle;
   int timer_cnt_ = 0;

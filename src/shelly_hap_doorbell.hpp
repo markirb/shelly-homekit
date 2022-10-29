@@ -26,6 +26,7 @@ class Doorbell : public StatelessSwitchBase {
   Doorbell(int id, Input *in, struct mgos_config_in_ssw *cfg);
   virtual ~Doorbell();
 
+  void InputEventHandler(Input::Event ev, bool state) override;
   // Component interface impl.
   Type type() const override;
 };

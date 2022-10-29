@@ -32,6 +32,16 @@ Doorbell::Doorbell(int id, Input *in, struct mgos_config_in_ssw *cfg)
 Doorbell::~Doorbell() {
 }
 
+void Doorbell::InputEventHandler(Input::Event ev, bool state) {
+  if (true) {  // Forward to Bell
+
+    StatelessSwitchBase::InputEventHandler(ev, state);
+  }
+  if (true) {  // Forward to Gong
+    // Forward event to Output
+  }
+}
+
 Component::Type Doorbell::type() const {
   return Type::kDoorbell;
 }

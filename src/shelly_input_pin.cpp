@@ -68,9 +68,9 @@ void InputPin::GPIOIntHandler(int pin, void *arg) {
   (void) pin;
 }
 
-void InputPin::DetectReset(double now, bool cur_state) {
-  if (cfg_.enable_reset && now < 30) {
-    if (now - last_change_ts_ > 5) {
+void InputPin::DetectReset(int64_t now, bool cur_state) {
+  if (cfg_.enable_reset && now < 30000) {
+    if (now - last_change_ts_ > 5000) {
       change_cnt_ = 0;
     }
     change_cnt_++;
@@ -82,13 +82,15 @@ void InputPin::DetectReset(double now, bool cur_state) {
 }
 
 void InputPin::HandleGPIOInt() {
+  int64_t now = mgos_uptime_micros();
   bool last_state = last_state_;
   bool cur_state = GetState();
+  if ((now - last_change_ts_) < 100000 && (last_state != cur_state))
+    return;                             // Switch Bouncing
   if (cur_state == last_state) return;  // Noise
   LOG(LL_DEBUG, ("Input %d: %s (%d), st %d", id(), OnOff(cur_state),
                  mgos_gpio_read(cfg_.pin), (int) state_));
   CallHandlers(Event::kChange, cur_state);
-  double now = mgos_uptime();
   DetectReset(now, cur_state);
   switch (state_) {
     case State::kIdle:

@@ -310,7 +310,7 @@ bool ShellySwitch::GetInputState() const {
 
 void ShellySwitch::InputEventHandler(Input::Event ev, bool state) {
   InMode in_mode = static_cast<InMode>(cfg_->in_mode);
-  if (in_mode == InMode::kDetached) {
+  if (in_mode == InMode::kDetached) { //we would need access to override detatched
     // Nothing to do
     return;
   }
